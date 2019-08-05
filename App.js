@@ -6,72 +6,60 @@
  * @flow
  */
 
-import React, {Fragment} from 'react';
+import React, {Component} from 'react';
 import {
-  SafeAreaView,
   StyleSheet,
-  ScrollView,
   View,
   Text,
-  StatusBar,
 } from 'react-native';
 
 import {
-  Header,
-  LearnMoreLinks,
   Colors,
-  DebugInstructions,
-  ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
-const App = () => {
-  return (
-    <Fragment>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <ScrollView
-          contentInsetAdjustmentBehavior="automatic"
-          style={styles.scrollView}>
-          <Header />
-          {global.HermesInternal == null ? null : (
-            <View style={styles.engine}>
-              <Text style={styles.footer}>Engine: Hermes</Text>
-            </View>
-          )}
-          <View style={styles.body}>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Step One</Text>
-              <Text style={styles.sectionDescription}>
-                Edit <Text style={styles.highlight}>App.js</Text> to change this
-                screen and then come back to see your edits.
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>See Your Changes</Text>
-              <Text style={styles.sectionDescription}>
-                <ReloadInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Debug</Text>
-              <Text style={styles.sectionDescription}>
-                <DebugInstructions />
-              </Text>
-            </View>
-            <View style={styles.sectionContainer}>
-              <Text style={styles.sectionTitle}>Learn More</Text>
-              <Text style={styles.sectionDescription}>
-                Read the docs to discover what to do next:
-              </Text>
-            </View>
-            <LearnMoreLinks />
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </Fragment>
-  );
-};
+import OneSignal from 'react-native-onesignal'; // Import package from node modules
 
+export default class App extends Component {
+
+constructor(properties) {
+    super(properties);
+    OneSignal.init("75580a21-7211-49b7-8439-c7f380b40e0e");
+
+    OneSignal.addEventListener('received', this.onReceived);
+    OneSignal.addEventListener('opened', this.onOpened);
+    OneSignal.addEventListener('ids', this.onIds);
+    OneSignal.configure(); 	// triggers the ids event
+  }
+
+  componentWillUnmount() {
+    OneSignal.removeEventListener('received', this.onReceived);
+    OneSignal.removeEventListener('opened', this.onOpened);
+    OneSignal.removeEventListener('ids', this.onIds);
+  }
+
+  onReceived(notification) {
+    alert("Notification received: ", notification);
+  }
+
+  onOpened(openResult) {
+    alert('Message: ', openResult.notification.payload.body);
+    alert('Data: ', openResult.notification.payload.additionalData);
+    alert('isActive: ', openResult.notification.isAppInFocus);
+    alert('openResult: ', openResult);
+  }
+
+  onIds(device) {
+    alert('Device info: ', device);
+  }
+
+  render() {
+    return (
+      <View style={styles.sectionContainer}>
+        <Text style={styles.sectionTitle}>REACT WITH ONE SIGNAL!</Text>
+      </View>
+    )
+  }
+}
 const styles = StyleSheet.create({
   scrollView: {
     backgroundColor: Colors.lighter,
@@ -111,4 +99,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default App;
+//export default App;
